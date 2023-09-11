@@ -75,14 +75,8 @@ let game = {
         for (let block of this.blocks) {
             if (block.active && this.ball.collide(block)) {
                 this.ball.bumpBlock(block);
-                this.addScore();
+                this.playBumpSound(); // Воспроизводим звук при столкновении с блоком
             }
-        }
-    },
-    addScore(){
-        ++this.addScore;
-        if (this.acore >= this.blocks.length){
-            this.render("you win")
         }
     },
     collidePlatform() {
@@ -97,7 +91,7 @@ let game = {
             if (this.running) {
                 this.run();
             } else {
-                alert('Game Over'); 
+                alert('Game Over'); // Оповещение о проигрыше
                 window.location.reload();
             }
         });
@@ -126,7 +120,13 @@ let game = {
     random(min, max) {
         return Math.floor(Math.random() * (max - min + 1) + min);
     },
-    running: true 
+    running: true, // Добавлено для управления состоянием игры
+    
+    playBumpSound() {
+        const bumpSound = document.getElementById("bumpSound");
+        bumpSound.currentTime = 0; // Сбрасываем текущее время звука, чтобы его можно было сразу воспроизвести снова
+        bumpSound.play();
+    },
 };
 
 game.ball = {
@@ -178,11 +178,9 @@ game.ball = {
         } else if (ballRight > worldRight) {
             this.x = worldRight - this.width;
             this.dx = -this.velocity;
-
         } else if (ballTop < worldTop) {
             this.y = 0;
             this.dy = this.velocity;
-
         } else if (ballBottom > worldBottom) {
             game.running = false;
             console.log('Game Over');
@@ -194,7 +192,7 @@ game.ball = {
         block.active = false;
     },
     bumpPlatform(platform) {
-        if (this.dy !== 0) { 
+        if (this.dy !== 0) {
             this.dy = -this.velocity;
             let touchX = this.x + this.width / 2;
             this.dx = this.velocity * platform.getTouchOffset(touchX);
@@ -212,7 +210,6 @@ game.platform = {
     ball: game.ball,
     fire() {
         if (this.ball) {
-
             this.ball.start();
             this.ball = null;
         }
@@ -229,20 +226,16 @@ game.platform = {
     },
     move() {
         if (this.dx) {
-            
             if (this.x + this.dx >= 0) {
-               
                 if (this.x + this.width + this.dx <= game.width) {
                     this.x += this.dx;
                     if (this.ball) {
                         this.ball.x += this.dx;
                     }
                 } else {
-                   
                     this.dx = 0;
                 }
             } else {
-      
                 this.dx = 0;
             }
         }
